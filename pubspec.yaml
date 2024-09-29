@@ -39,6 +39,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.9.3
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -66,7 +67,15 @@ flutter:
   assets:
     - assets/images/woodfish.png
     - assets/audio/woodfish_sound.mp3
+    - assets/images/bo.png
+    - assets/audio/bo.mp3
 
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "icons/app_icon.png"  # 替換成你的圖示路徑
+  
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

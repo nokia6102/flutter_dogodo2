@@ -42,6 +42,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   double _opacity = 0.0; // 初始時文字隱藏
   Offset _offset = const Offset(0, 0); // 控制文字初始位置
+  double _boOpacity = 0.0; // 控制 "回向+1" 的透明度
+  Offset _boOffset = const Offset(0, 0); // 控制 "回向+1" 的位置
   final AudioPlayer _audioPlayer = AudioPlayer(); // 創建 AudioPlayer 實例
   bool _isMuted = false; // 靜音狀態變量
 
@@ -74,6 +76,41 @@ class _MyHomePageState extends State<MyHomePage> {
         Future.delayed(const Duration(milliseconds: 0), () {
           setState(() {
             _offset = const Offset(0, 0); // 無動畫地重置位置
+          });
+        });
+      });
+    });
+  }
+
+  void _playBoSound() async {
+    if (!_isMuted) {
+      // 播放 bo.mp3 音效
+      await _audioPlayer.play(AssetSource('audio/bo.mp3'));
+    }
+
+    // 按下按鈕後顯示 "回向+1"
+    setState(() {
+      _boOffset = const Offset(0, 0); // 重置位置
+      _boOpacity = 1.0; // 讓 "回向+1" 顯示出來
+      _counter++; // 計數器也加一
+    });
+
+    // 延遲 100 毫秒後，讓 "回向+1" 開始浮動並消失
+    Future.delayed(const Duration(milliseconds: 100), () {
+      setState(() {
+        _boOffset = const Offset(0, -2); // "回向+1" 開始向上浮動
+      });
+
+      // 延遲 300 毫秒後讓 "回向+1" 漸漸消失
+      Future.delayed(const Duration(milliseconds: 300), () {
+        setState(() {
+          _boOpacity = 0.0; // 讓 "回向+1" 消失
+        });
+
+        // 重置位置而不使用動畫
+        Future.delayed(const Duration(milliseconds: 0), () {
+          setState(() {
+            _boOffset = const Offset(0, 0); // 無動畫地重置位置
           });
         });
       });
@@ -142,12 +179,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 letterSpacing: 0.50,
               ),
             ),
+            // 顯示木魚加的文字
             Container(
               width: 375,
               height: 140,
               alignment: Alignment.center,
               child: AnimatedSlide(
-                offset: _offset, // 控制文字移動的偏移量
+                offset: _offset, // 控制 "功德+1" 的偏移量
                 duration: const Duration(milliseconds: 300), // 移動動畫時間
                 child: AnimatedOpacity(
                   opacity: _opacity, // 文字的透明度
@@ -163,15 +201,52 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            const SizedBox(height: 0), // 增加按鈕與上方元素之間的距離
-            GestureDetector(
-              onTap: _incrementCounter, // 按鈕點擊事件
-              child: Container(
-                width: 240,
-                height: 240,
-                alignment: Alignment.center,
-                child: Image.asset("assets/images/woodfish.png"), // 無背景的圖片按鈕
+            // 顯示bo按鈕加的文字
+            Container(
+              width: 375,
+              height: 140,
+              alignment: Alignment.center,
+              child: AnimatedSlide(
+                offset: _boOffset, // 控制 "回向+1" 的偏移量
+                duration: const Duration(milliseconds: 300), // 移動動畫時間
+                child: AnimatedOpacity(
+                  opacity: _boOpacity, // 文字的透明度
+                  duration: const Duration(milliseconds: 300), // 透明度變化時間
+                  child: const Text(
+                    "回向+1",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: "Noto Sans TC",
+                    ),
+                  ),
+                ),
               ),
+            ),
+            const SizedBox(height: 20), // 增加按鈕與上方元素之間的距離
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: _incrementCounter, // 木魚按鈕點擊事件
+                  child: Container(
+                    width: 150,
+                    height: 150,
+                    alignment: Alignment.center,
+                    child: Image.asset("assets/images/woodfish.png"), // 無背景的木魚圖片按鈕
+                  ),
+                ),
+                const SizedBox(width: 20), // 木魚與新按鈕之間的間距
+                GestureDetector(
+                  onTap: _playBoSound, // bo 按鈕點擊事件
+                  child: Container(
+                    width: 120,
+                    height: 120,
+                    alignment: Alignment.center,
+                    child: Image.asset("assets/images/bo.png"), // 無背景的 bo 按鈕圖片
+                  ),
+                ),
+              ],
             ),
           ],
         ),
